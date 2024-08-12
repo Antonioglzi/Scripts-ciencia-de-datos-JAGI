@@ -1,0 +1,20 @@
+import pandas as pd
+import numpy as np
+import scipy.cluster.hierarchy as sch
+from sklearn.datasets import load_iris
+import matplotlib.pyplot as plt
+
+# Cargar conjunto de datos de ejemplo
+data = load_iris()
+X = data.data
+
+# Aplicar clustering jerárquico
+linked = sch.linkage(X, method='ward')
+
+# Dibujar el dendrograma
+plt.figure(figsize=(10, 7))
+sch.dendrogram(linked, labels=data.target_names[data.target])
+plt.title('Dendrograma')
+plt.xlabel('Muestras')
+plt.ylabel('Distancia Euclidiana')
+plt.show()
