@@ -11,3 +11,5 @@ b) Librerias de pandas
 2. Herramientas para Extracción de información: a)Paginas Web (Scraping web)  b) Scraping Json (API-Interfaces de Programación de Aplicaciones) c)Consultas con SQL
 
 3. Filtrado de archivos CSV con pandas
+
+4. 4. Regresiones:  a) Lineal, b) Logistica
