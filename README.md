@@ -12,4 +12,4 @@ b) Librerias de pandas
 
 3. Filtrado de archivos CSV con pandas
 
-4. 4. Regresiones:  a) Lineal, b) Logistica
+4. Regresiones:  a) Lineal, b) Logistica
