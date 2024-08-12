@@ -1,0 +1,88 @@
+# se importan librerias y funciones apriori y reglas de asociacion
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+from mlxtend.frequent_patterns import apriori
+from mlxtend.frequent_patterns import association_rules
+
+# se importa archvio a trabajar con base de datos y se ve estructura
+bread_basket_data = pd.read_csv('d://ciencia de datos/datos masivos/kaggle bakery/BreadBasket_DMS.csv')
+bread_basket_data.head(10)
+bread_basket_data.shape
+
+# se identifican y cuentan filas con NONE
+bread_basket_data.loc[bread_basket_data['Item'] == 'NONE'].count()
+# se eliminan filas con NONE y se genera un nuevo dataframe
+bread_basket_data = bread_basket_data.drop(
+    bread_basket_data.loc[bread_basket_data['Item'] == 'NONE'].index)
+bread_basket_data.loc[bread_basket_data['Item'] == 'NONE'].count()
+# seobtienen el numero de filas y columnas del archivo filtrado
+bread_basket_data.loc[bread_basket_data['Item'] == 'NONE'].count()
+# se obtiene lista de productos unicos (no considera repeticiones)
+bread_basket_data['Item'].unique()
+
+# se genera nueva lista de palabras con su frecuencia de repetición
+basket_items = {}
+for item in bread_basket_data['Item']:
+    if item in basket_items:
+        basket_items[item] = basket_items[item] + 1
+    else:
+        basket_items[item] = 1
+basket_items
+# Se arma nueva tabla para presentar productos y frecuencias
+item_names = []
+item_frequencies = []
+
+for key, val in basket_items.items():
+    item_names.append(key)
+    item_frequencies.append(val)
+    
+    items_table = pd.DataFrame({'Names': item_names,
+                            'Frequencies': item_frequencies})
+items_table
+# se ordenan or frecuencia
+items_table.sort_values('Frequencies', ascending=False).head()
+items_table.plot.bar(y='Frequencies', x='Names', figsize=(12, 8))
+items_table.sort_values('Frequencies', ascending=False).head(20).\
+    plot.bar(y='Frequencies', x='Names', figsize=(12, 8))
+# resumen estadistico
+bread_basket_data['Transaction'].describe()
+#agrupa  cuenta por transacción
+bread_basket_data = bread_basket_data.groupby('Transaction').agg(','.join).reset_index()
+
+bread_basket_data = bread_basket_data.drop(['Date', 'Time'], axis=1)
+bread_basket_data.head(10)
+read_basket_data.shape
+items_data = bread_basket_data['Item']
+items_data.head(10)
+
+items_list = [item.split(',') for item in items_data]
+items_list_df = pd.DataFrame({'Items': items_list})
+items_list_df.head(10)
+
+#Reglas de asociacion para mineria de datos y prepara archivo para usar algoritmo apriori
+from mlxtend.preprocessing import TransactionEncoder
+from mlxtend.frequent_patterns import apriori
+transencoder = TransactionEncoder()
+transencoder_array = transencoder.fit(items_list).transform(items_list)
+encoded_df = pd.DataFrame(transencoder_array, columns=transencoder.columns_)
+encoded_df.head(10)
+
+# aplica algoritmo apriori
+item_support_df = apriori(encoded_df, min_support=0.01, use_colnames=True)
+item_support_df.shape
+item_support_df.sample(10)
+
+from mlxtend.frequent_patterns import association_rules
+rules = association_rules(item_support_df, 
+                          metric='confidence', min_threshold=0.1)
+rules.shape
+
+#muestra reglas de asociación
+rules.sample(10)
+rules.sort_values('confidence', ascending=False).head(10)
+rules["antecedent_len"] = rules["antecedents"].apply(lambda x: len(x))
+rules.sample(5)
+
+rules[rules['antecedents'] == {'Juice'}]
