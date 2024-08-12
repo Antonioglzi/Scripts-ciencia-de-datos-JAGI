@@ -15,3 +15,5 @@ b) Librerias de pandas
 4. Regresiones:  a) Lineal, b) Logistica
 
 5. Reglas de asociación: Kagle
+
+6. Clustering  - Kmeans
