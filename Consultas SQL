@@ -1,0 +1,17 @@
+#  Ejemplo 1
+SELECT first_name, age, avg(age) as 'promedio edad'
+FROM Customers;
+
+#Ejemplo 2
+SELECT item, amount 
+FROM Orders;
+SELECT sum(amount) as 'todal pedido'
+FROM Orders;
+
+#Ejemplo 3
+SELECT shipping_id, customer, 
+CASE
+WHEN status='Pending' THEN 'Pedidos Pendientes'
+Else 'Entregado'
+END as 'Status'
+FROM Shippings;
