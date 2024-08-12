@@ -6,6 +6,5 @@ Instalaciones necesarias con pip install:
 a) Python 3.11 o posterior
 b) Librerias de pandas
 
-1 Redes Neuronales
-   a) Torch
-   b) Torchvision
+1 Redes Neuronales:  a) Torch  b) Torchvision
+2. Herramientas para Extracción de información:  Paginas Web (Scraping web)
