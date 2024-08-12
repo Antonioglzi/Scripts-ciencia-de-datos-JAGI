@@ -13,3 +13,5 @@ b) Librerias de pandas
 3. Filtrado de archivos CSV con pandas
 
 4. Regresiones:  a) Lineal, b) Logistica
+
+5. Reglas de asociación: Kagle
