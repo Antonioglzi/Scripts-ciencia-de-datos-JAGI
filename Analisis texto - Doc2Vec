@@ -1,0 +1,23 @@
+# Modelo Doc2Vec
+
+from gensim.models import Doc2Vec
+from gensim.models.doc2vec import TaggedDocument
+
+# Ejemplo de corpus de documentos
+documents = [
+    TaggedDocument(words=['el', 'perro', 'ladra'], tags=['doc1']),
+    TaggedDocument(words=['el', 'gato', 'maúlla'], tags=['doc2']),
+    TaggedDocument(words=['el', 'perro', 'y', 'el', 'gato', 'son', 'amigos'], tags=['doc3']),
+    TaggedDocument(words=['el', 'perro', 'ladra', 'y', 'el', 'gato', 'maúlla'], tags=['doc4'])
+]
+
+# Entrenar el modelo Doc2Vec
+model = Doc2Vec(documents, vector_size=100, window=5, min_count=1, workers=4)
+
+# Obtener el vector del documento 'doc1'
+vector = model.dv['doc1']
+print("Vector de 'doc1':\n", vector, "de Tamaño ", vector.shape[0])
+
+# Encontrar documentos similares a 'doc1'
+similar_docs = model.dv.most_similar('doc1')
+print("Documentos similares a 'doc1':\n", similar_docs)
