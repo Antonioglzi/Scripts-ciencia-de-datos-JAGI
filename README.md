@@ -16,4 +16,4 @@ b) Librerias de pandas
 
 5. Reglas de asociación: Kagle
 
-6. Clustering  - a) Kmeans, b) Jerarquico y c) DBSCAN
+6. Clustering  - a) Kmeans, b) Jerarquico y c) DBSCAN  d) Clasificador con multiples modelos
