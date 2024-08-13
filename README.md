@@ -19,3 +19,5 @@ b) Librerias de pandas
 6. Clustering  - a) Kmeans, b) Jerarquico y c) DBSCAN  d) Clasificador con multiples modelos
 
 7. Series de Tiempo:  a) Prophet y b) ARIMA
+
+8. Analisis de texto
