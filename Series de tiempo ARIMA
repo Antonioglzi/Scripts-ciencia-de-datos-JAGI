@@ -1,0 +1,78 @@
+# Configura la frecuencia a mensual
+series = series.asfreq('MS')  
+
+# Plotear la serie de tiempo original
+plt.figure(figsize=(10, 6))
+plt.plot(series, label='Pasajeros Mensuales')
+plt.title('Datos de Series de Tiempo: Pasajeros Mensuales')
+plt.xlabel('Año')
+plt.ylabel('# Pasajeros')
+plt.legend()
+plt.show()
+
+# Verificar estacionariedad utilizando la prueba de Dickey-Fuller aumentada
+result = adfuller(series)
+print('ADF Statistic:', result[0])
+print('p-value:', result[1])
+
+# Si la serie no es estacionaria, diferenciar los datos
+differenced_series = series.diff().dropna()
+
+from statsmodels.graphics.tsaplots import plot_acf 
+fig, (ax1, ax2, ax3) = plt.subplots(3) 
+plot_acf(series, ax=ax1) 
+plot_acf(series.diff().dropna(), ax=ax2) 
+plot_acf(series.diff().diff().dropna(), ax=ax3)
+
+# Identificación de los parámetros p y q utilizando ACF y PACF
+fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+sm.graphics.tsa.plot_acf(differenced_series, lags=20, ax=axes[0])
+sm.graphics.tsa.plot_pacf(differenced_series, lags=20, ax=axes[1])
+plt.show()
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from prophet import Prophet
+import warnings
+
+# Cargar datos de ejemplo
+data = pd.read_csv('d://ciencia de datos/datos masivos/pasajeros avion/AirPassengers.csv', parse_dates=['Month'], index_col='Month')
+series = data['#Passengers']
+data = data.reset_index()
+data.columns = ['ds', 'y']
+
+series.index = pd.to_datetime(series.index)  # Convierte el índice a tipo datetime si no lo es
+series = series.asfreq('MS')  # Configura la frecuencia a mensual
+
+
+# Visualizar datos
+plt.figure(figsize=(10, 6))
+plt.plot(data['ds'], data['y'], label='Pasajeros Mensuales')
+plt.title('Datos de Series de Tiempo: Pasajeros Mensuales')
+plt.xlabel('Años')
+plt.ylabel('# Pasajeros')
+plt.legend()
+plt.show()
+
+# Construir el modelo Prophet
+model = Prophet()
+model.fit(data)
+
+# Realizar pronósticos
+future = model.make_future_dataframe(periods=24, freq='M')
+forecast = model.predict(future)
+
+# Visualizar pronósticos
+fig = model.plot(forecast)
+plt.title('Pronóstico de Numero de Pasajeros Mensuales con Prophet')
+plt.xlabel('Año')
+plt.ylabel('# Pasajeros')
+plt.show()
+
+# Visualizar componentes del modelo
+fig2 = model.plot_components(forecast)
+plt.show()
+
+# Suprimir advertencias de FutureWarning para mantener la salida limpia
+warnings.filterwarnings("ignore", category=FutureWarning)
