@@ -20,4 +20,6 @@ b) Librerias de pandas
 
 7. Series de Tiempo:  a) Prophet y b) ARIMA
 
-8. Analisis de texto
+8. Analisis de texto embeddings:   a) BoW b) Word2Vec c) Doc2Vec d) TF IDF
+9. Analisis de texto a) pandas y scikit-learn b) nltk y textBlop
+10. Analsis de texto - sentimientos
