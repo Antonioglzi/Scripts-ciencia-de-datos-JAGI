@@ -1,0 +1,53 @@
+# Modelo TF IDF
+# Con pandas y scikit-learn
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# Definir el conjunto de documentos
+documents = [
+    "Data science is an interdisciplinary field",
+    "Machine learning is a part of data science",
+    "Data science involves statistics"
+]
+
+# Crear el vectorizador TF-IDF
+vectorizer = TfidfVectorizer()
+
+# Ajustar y transformar los documentos
+tfidf_matrix = vectorizer.fit_transform(documents)
+
+# Crear un DataFrame para visualizar los resultados
+df = pd.DataFrame(tfidf_matrix.toarray(), columns=vectorizer.get_feature_names_out())
+print(df)
+
+# Modelo TF IDF
+# Con pnltk y textBlop
+import nltk
+nltk.download('punkt')
+
+from textblob import TextBlob
+
+# Lista de textos a analizar
+texts = [
+    "I love this product! It's absolutely amazing.",
+    "This is the worst experience I've ever had.",
+    "The movie was okay, not great but not terrible either.",
+    "I'm extremely happy with the service.",
+    "I hate waiting in long lines."
+]
+
+# Función para obtener el sentimiento
+def get_sentiment(text):
+    analysis = TextBlob(text)
+    # Devuelve el sentimiento con polaridad y subjetividad
+    return analysis.sentiment
+
+# Analizar los textos
+for text in texts:
+    sentiment = get_sentiment(text)
+    print(f'Text: "{text}"')
+    print(f'Polarity: {sentiment.polarity}, Subjectivity: {sentiment.subjectivity}')
+    print()
+
+
+
