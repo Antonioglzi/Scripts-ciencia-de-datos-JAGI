@@ -1,0 +1,34 @@
+# Analisis de sentimiento
+
+import nltk
+nltk.download('punkt')
+
+from textblob import TextBlob
+
+# Lista de textos a analizar
+texts = [
+    "The customer service at this place is exceptional. They really went above and beyond to help me.",
+    "I can't believe how terrible the food was. I will never eat here again.",
+    "The new software update has significantly improved my productivity.",
+    "I'm feeling quite sad and lonely today.",
+    "What a wonderful surprise! The gift was exactly what I wanted.",
+    "This product broke after just one use. Extremely disappointed.",
+    "I'm so excited about the upcoming vacation. It's going to be amazing!",
+    "The weather is gloomy and it's affecting my mood negatively.",
+    "I appreciate how user-friendly and intuitive this app is.",
+    "I'm furious about the delay in my order. This is unacceptable."
+    ]
+
+# Función para obtener el sentimiento
+def get_sentiment(text):
+    analysis = TextBlob(text)
+    # Devuelve el sentimiento con polaridad y subjetividad
+    return analysis.sentiment
+
+# Analizar los textos
+for text in texts:
+    sentiment = get_sentiment(text)
+    print(f'Text: "{text}"')
+    print(f'Polarity: {sentiment.polarity}, Subjectivity: {sentiment.subjectivity}')
+    print()
+
