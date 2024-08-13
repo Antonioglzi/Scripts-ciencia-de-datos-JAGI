@@ -1,0 +1,478 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.tree import plot_tree
+import matplotlib.pyplot as plt
+
+# 1. Carga archivo csv
+r = 'd:\\Ciencia de datos\\datos masivos\\Parkinson2\\parkinsons_disease_data.csv'
+df = pd.read_csv(r)
+# 2. Inspect the Dataset
+print(df)
+
+# Preparación de datos
+X = df[['Age','Gender','Ethnicity','EducationLevel','BMI','Smoking','AlcoholConsumption','PhysicalActivity','DietQuality','SleepQuality','FamilyHistoryParkinsons',
+        'TraumaticBrainInjury','Hypertension','Diabetes','Depression','Stroke','SystolicBP','DiastolicBP','CholesterolTotal','CholesterolLDL','CholesterolHDL',
+        'CholesterolTriglycerides','UPDRS','MoCA','FunctionalAssessment','Tremor','Rigidity','Bradykinesia','PosturalInstability','SpeechProblems','SleepDisorders',
+        'Constipation']]
+y = df['Diagnosis']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Modelo Árbol de Decisión
+model = DecisionTreeClassifier()
+model.fit(X_train, y_train)
+
+# Predicciones
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f'Accuracy: {accuracy}')
+
+# Visualización del árbol
+plt.figure(figsize=(15,8))
+plot_tree(model, feature_names=['Age','Gender','Ethnicity','EducationLevel','BMI','Smoking','AlcoholConsumption','PhysicalActivity','DietQuality','SleepQuality','FamilyHistoryParkinsons',
+        'TraumaticBrainInjury','Hypertension','Diabetes','Depression','Stroke','SystolicBP','DiastolicBP','CholesterolTotal','CholesterolLDL','CholesterolHDL',
+        'CholesterolTriglycerides','UPDRS','MoCA','FunctionalAssessment','Tremor','Rigidity','Bradykinesia','PosturalInstability','SpeechProblems','SleepDisorders',
+        'Constipation'], class_names=['No', 'Sí'], filled=True)
+plt.show()
+
+# Modelo Regla de Bayes
+# Probabilidad de parkinson
+P_parkinson = 0.6195
+P_non_parkinson = 0.3805
+
+# Probabilidad de palabras 
+P_word_given_parkinson = {'Age': 0.03125,'Gender': 0.03125,'Ethnicity': 0.03125,'EducationLevel': 0.03125,'BMI': 0.03125,'Smoking': 0.03125,'AlcoholConsumption': 0.03125,
+'PhysicalActivity': 0.03125,'DietQuality': 0.03125,'SleepQuality': 0.03125,'FamilyHistoryParkinsons': 0.03125,
+        'TraumaticBrainInjury': 0.03125,'Hypertension': 0.03125,'Diabetes': 0.03125,'Depression': 0.03125,'Stroke': 0.03125,'SystolicBP': 0.03125,'DiastolicBP': 0.03125,
+                     'CholesterolTotal': 0.03125,'CholesterolLDL': 0.03125,'CholesterolHDL': 0.03125,
+        'CholesterolTriglycerides': 0.03125,'UPDRS': 0.03125,'MoCA': 0.03125,'FunctionalAssessment': 0.03125,'Tremor': 0.03125,'Rigidity': 0.03125,
+                          'Bradykinesia': 0.03125,'PosturalInstability': 0.03125,'SpeechProblems': 0.03125,'SleepDisorders': 0.03125,'Constipation': 0.03125}
+P_word_given_non_parkinson = {'Age': 0.03125,'Gender': 0.03125,'Ethnicity': 0.03125,'EducationLevel': 0.03125,'BMI': 0.03125,'Smoking': 0.03125,'AlcoholConsumption': 0.03125,
+'PhysicalActivity': 0.03125,'DietQuality': 0.03125,'SleepQuality': 0.03125,'FamilyHistoryParkinsons': 0.03125,
+        'TraumaticBrainInjury': 0.03125,'Hypertension': 0.03125,'Diabetes': 0.03125,'Depression': 0.03125,'Stroke': 0.03125,'SystolicBP': 0.03125,'DiastolicBP': 0.03125,
+                     'CholesterolTotal': 0.03125,'CholesterolLDL': 0.03125,'CholesterolHDL': 0.03125,
+        'CholesterolTriglycerides': 0.03125,'UPDRS': 0.03125,'MoCA': 0.03125,'FunctionalAssessment': 0.03125,'Tremor': 0.03125,'Rigidity': 0.03125,'Bradykinesia': 0.03125,
+                     'PosturalInstability': 0.03125,'SpeechProblems': 0.03125,'SleepDisorders': 0.03125,'Constipation': 0.03125}
+
+# Nuevo diagnostico a evaluar
+new_diagnostic = ['Age','Gender','Ethnicity','EducationLevel','BMI','Smoking','AlcoholConsumption','PhysicalActivity','DietQuality','SleepQuality','FamilyHistoryParkinsons',
+        'TraumaticBrainInjury','Hypertension','Diabetes','Depression','Stroke','SystolicBP','DiastolicBP','CholesterolTotal','CholesterolLDL','CholesterolHDL',
+        'CholesterolTriglycerides','UPDRS','MoCA','FunctionalAssessment','Tremor','Rigidity','Bradykinesia','PosturalInstability','SpeechProblems','SleepDisorders',
+        'Constipation']
+
+# Calcular probabilidad de que el correo sea spam y no spam
+P_parkinson_given_diagnostic = P_parkinson
+P_non_parkinson_given_diagnostic = P_non_parkinson
+
+for word in new_diagnostic:
+    P_parkinson_given_diagnostic *= P_word_given_parkinson.get(word, 0.01)
+    P_non_parkinson_given_diagnostic *= P_word_given_non_parkinson.get(word, 0.01)
+
+# Normalizar probabilidades
+P_total = P_parkinson_given_diagnostic + P_non_parkinson_given_diagnostic
+P_parkinson_given_diagnostic /= P_total
+P_non_parkinson_given_diagnostic /= P_total
+
+print(f'Probabilidad de parkinson: {P_parkinson_given_diagnostic}')
+print(f'Probabilidad de no parkinson: {P_non_parkinson_given_diagnostic}')
+
+# Modelo SVM
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+##from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
+
+# Cargar datos desde el archivo CSV
+file_path = 'd:\\Ciencia de datos\\datos masivos\\Parkinson2\\parkinsons_disease_data.csv'
+df = pd.read_csv(file_path)
+
+# Preparación de datos
+X = df[['Age','Gender','Ethnicity','EducationLevel','BMI','Smoking','AlcoholConsumption','PhysicalActivity','DietQuality','SleepQuality','FamilyHistoryParkinsons',
+        'TraumaticBrainInjury','Hypertension','Diabetes','Depression','Stroke','SystolicBP','DiastolicBP','CholesterolTotal','CholesterolLDL','CholesterolHDL',
+        'CholesterolTriglycerides','UPDRS','MoCA','FunctionalAssessment','Tremor','Rigidity','Bradykinesia','PosturalInstability','SpeechProblems','SleepDisorders',
+        'Constipation']].values
+y = df['Diagnosis'].values
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Entrenar el modelo SVM
+model = SVC(kernel='poly')
+model.fit(X_train, y_train)
+
+# Predicciones
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f'Accuracy: {accuracy}')
+
+# Modelo MLP Clasifier
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. Cargar el dataset
+file_path = 'd:\\Ciencia de datos\\datos masivos\\Parkinson2\\parkinsons_disease_data.csv'
+df = pd.read_csv(file_path)
+
+# 2. Preparar los datos
+X = df[['Age','Gender','Ethnicity','EducationLevel','BMI','Smoking','AlcoholConsumption','PhysicalActivity','DietQuality','SleepQuality','FamilyHistoryParkinsons',
+        'TraumaticBrainInjury','Hypertension','Diabetes','Depression','Stroke','SystolicBP','DiastolicBP','CholesterolTotal','CholesterolLDL','CholesterolHDL',
+        'CholesterolTriglycerides','UPDRS','MoCA','FunctionalAssessment','Tremor','Rigidity','Bradykinesia','PosturalInstability','SpeechProblems','SleepDisorders',
+        'Constipation']].values
+y = df['Diagnosis'].values
+
+# 3. Dividir los datos en entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. Inicializar y entrenar el modelo MLPClassifier
+model = MLPClassifier(hidden_layer_sizes=(100,), max_iter=500, random_state=42)
+model.fit(X_train, y_train)
+
+# 5. Evaluar el modelo
+y_pred = model.predict(X_test)
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
+
+# 6. Opcional: Visualizar la matriz de confusión
+plt.figure(figsize=(8, 6))
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, cmap='Blues', fmt='d', xticklabels=['No Parkinson', 'Parkinson'], yticklabels=['No Parkinson', 'Parkinson'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()
+
+#Modelo Random Forest Classifier
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. Cargar el dataset
+file_path = 'd:\\Ciencia de datos\\datos masivos\\Parkinson2\\parkinsons_disease_data.csv'
+df = pd.read_csv(file_path)
+
+# 2. Preparar los datos
+X = df[['Age','Gender','Ethnicity','EducationLevel','BMI','Smoking','AlcoholConsumption','PhysicalActivity','DietQuality','SleepQuality','FamilyHistoryParkinsons',
+        'TraumaticBrainInjury','Hypertension','Diabetes','Depression','Stroke','SystolicBP','DiastolicBP','CholesterolTotal','CholesterolLDL','CholesterolHDL',
+        'CholesterolTriglycerides','UPDRS','MoCA','FunctionalAssessment','Tremor','Rigidity','Bradykinesia','PosturalInstability','SpeechProblems','SleepDisorders',
+        'Constipation']].values
+y = df['Diagnosis'].values
+
+# 3. Dividir los datos en entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. Inicializar y entrenar el modelo RandomForestClassifier
+model = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=42)
+model.fit(X_train, y_train)
+
+# 5. Evaluar el modelo
+y_pred = model.predict(X_test)
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
+
+# 6. Opcional: Visualizar la matriz de confusión
+plt.figure(figsize=(8, 6))
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, cmap='Blues', fmt='d', xticklabels=['No Parkinson', 'Parkinson'], yticklabels=['No Parkinson', 'Parkinson'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()
+
+# Modelo  Kneighnors Clasifier
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. Cargar el dataset
+file_path = 'd:\\Ciencia de datos\\datos masivos\\Parkinson2\\parkinsons_disease_data.csv'
+df = pd.read_csv(file_path)
+
+# 2. Preparar los datos
+X = df[['Age','Gender','Ethnicity','EducationLevel','BMI','Smoking','AlcoholConsumption','PhysicalActivity','DietQuality','SleepQuality','FamilyHistoryParkinsons',
+        'TraumaticBrainInjury','Hypertension','Diabetes','Depression','Stroke','SystolicBP','DiastolicBP','CholesterolTotal','CholesterolLDL','CholesterolHDL',
+        'CholesterolTriglycerides','UPDRS','MoCA','FunctionalAssessment','Tremor','Rigidity','Bradykinesia','PosturalInstability','SpeechProblems','SleepDisorders',
+        'Constipation']].values
+y = df['Diagnosis'].values
+
+# 3. Dividir los datos en entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. Inicializar y entrenar el modelo KNeighborsClassifier
+model = KNeighborsClassifier(n_neighbors=32)
+model.fit(X_train, y_train)
+
+# 5. Evaluar el modelo
+y_pred = model.predict(X_test)
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
+
+# 6. Opcional: Visualizar la matriz de confusión
+plt.figure(figsize=(8, 6))
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, cmap='Blues', fmt='d', xticklabels=['No Parkinson', 'Parkinson'], yticklabels=['No Parkinson', 'Parkinson'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()
+
+# Modelo lineal SVM
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.svm import LinearSVC
+from sklearn.metrics import classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. Cargar el dataset
+file_path = 'd:\\Ciencia de datos\\datos masivos\\Parkinson2\\parkinsons_disease_data.csv'
+df = pd.read_csv(file_path)
+
+# 2. Preparar los datos
+X = df[['Age','Gender','Ethnicity','EducationLevel','BMI','Smoking','AlcoholConsumption','PhysicalActivity','DietQuality','SleepQuality','FamilyHistoryParkinsons',
+        'TraumaticBrainInjury','Hypertension','Diabetes','Depression','Stroke','SystolicBP','DiastolicBP','CholesterolTotal','CholesterolLDL','CholesterolHDL',
+        'CholesterolTriglycerides','UPDRS','MoCA','FunctionalAssessment','Tremor','Rigidity','Bradykinesia','PosturalInstability','SpeechProblems','SleepDisorders',
+        'Constipation']].values
+y = df['Diagnosis'].values
+
+# 3. Dividir los datos en entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. Inicializar y entrenar el modelo Linear SVM (LinearSVC)
+model = LinearSVC(random_state=42, dual=False)
+model.fit(X_train, y_train)
+
+# 5. Evaluar el modelo
+y_pred = model.predict(X_test)
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
+
+# 6. Opcional: Visualizar la matriz de confusión
+plt.figure(figsize=(8, 6))
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, cmap='Blues', fmt='d', xticklabels=['No Parkinson', 'Parkinson'], yticklabels=['No Parkinson', 'Parkinson'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()
+
+# Modelo RBF SVM
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. Cargar el dataset
+file_path = 'd:\\Ciencia de datos\\datos masivos\\Parkinson2\\parkinsons_disease_data.csv'
+df = pd.read_csv(file_path)
+
+# 2. Preparar los datos
+X = df[['Age','Gender','Ethnicity','EducationLevel','BMI','Smoking','AlcoholConsumption','PhysicalActivity','DietQuality','SleepQuality','FamilyHistoryParkinsons',
+        'TraumaticBrainInjury','Hypertension','Diabetes','Depression','Stroke','SystolicBP','DiastolicBP','CholesterolTotal','CholesterolLDL','CholesterolHDL',
+        'CholesterolTriglycerides','UPDRS','MoCA','FunctionalAssessment','Tremor','Rigidity','Bradykinesia','PosturalInstability','SpeechProblems','SleepDisorders',
+        'Constipation']].values
+y = df['Diagnosis'].values
+
+# 3. Dividir los datos en entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. Inicializar y entrenar el modelo SVM con Kernel RBF (SVC)
+model = SVC(kernel='rbf', gamma='scale', random_state=42)
+model.fit(X_train, y_train)
+
+# 5. Evaluar el modelo
+y_pred = model.predict(X_test)
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
+
+# 6. Opcional: Visualizar la matriz de confusión
+plt.figure(figsize=(8, 6))
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, cmap='Blues', fmt='d', xticklabels=['No Parkinson', 'Parkinson'], yticklabels=['No Parkinson', 'Parkinson'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()
+
+# Modelo red neuronal
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.neural_network import MLPClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. Cargar el dataset
+file_path = 'd:\\Ciencia de datos\\datos masivos\\Parkinson2\\parkinsons_disease_data.csv'
+df = pd.read_csv(file_path)
+
+# 2. Preparar los datos
+X = df[['Age','Gender','Ethnicity','EducationLevel','BMI','Smoking','AlcoholConsumption','PhysicalActivity','DietQuality','SleepQuality','FamilyHistoryParkinsons',
+        'TraumaticBrainInjury','Hypertension','Diabetes','Depression','Stroke','SystolicBP','DiastolicBP','CholesterolTotal','CholesterolLDL','CholesterolHDL',
+        'CholesterolTriglycerides','UPDRS','MoCA','FunctionalAssessment','Tremor','Rigidity','Bradykinesia','PosturalInstability','SpeechProblems','SleepDisorders',
+        'Constipation']].values
+y = df['Diagnosis'].values
+
+# 3. Dividir los datos en entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. Inicializar y entrenar el modelo MLPClassifier
+model = MLPClassifier(hidden_layer_sizes=(100,), max_iter=500, alpha=0.0001,
+                      solver='adam', random_state=42, verbose=10)
+model.fit(X_train, y_train)
+
+# 5. Evaluar el modelo
+y_pred = model.predict(X_test)
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
+
+# 6. Opcional: Visualizar la matriz de confusión
+plt.figure(figsize=(8, 6))
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, cmap='Blues', fmt='d', xticklabels=['No Parkinson', 'Parkinson'], yticklabels=['No Parkinson', 'Parkinson'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()
+
+# Modelo AdaBoost
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. Cargar el dataset
+file_path = 'd:\\Ciencia de datos\\datos masivos\\Parkinson2\\parkinsons_disease_data.csv'
+df = pd.read_csv(file_path)
+
+# 2. Preparar los datos
+X = df[['Age','Gender','Ethnicity','EducationLevel','BMI','Smoking','AlcoholConsumption','PhysicalActivity','DietQuality','SleepQuality','FamilyHistoryParkinsons',
+        'TraumaticBrainInjury','Hypertension','Diabetes','Depression','Stroke','SystolicBP','DiastolicBP','CholesterolTotal','CholesterolLDL','CholesterolHDL',
+        'CholesterolTriglycerides','UPDRS','MoCA','FunctionalAssessment','Tremor','Rigidity','Bradykinesia','PosturalInstability','SpeechProblems','SleepDisorders',
+        'Constipation']].values
+y = df['Diagnosis'].values
+
+# 3. Dividir los datos en entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. Inicializar y entrenar el modelo AdaBoostClassifier
+model = AdaBoostClassifier(n_estimators=32, random_state=42)
+model.fit(X_train, y_train)
+
+# 5. Evaluar el modelo
+y_pred = model.predict(X_test)
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
+
+# 6. Opcional: Visualizar la matriz de confusión
+plt.figure(figsize=(8, 6))
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, cmap='Blues', fmt='d', xticklabels=['No Parkinson', 'Parkinson'], yticklabels=['No Parkinson', 'Parkinson'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()
+
+Modelo Naive Bayes cnon GaussianNB
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. Cargar el dataset
+file_path = 'd:\\Ciencia de datos\\datos masivos\\Parkinson2\\parkinsons_disease_data.csv'
+df = pd.read_csv(file_path)
+
+# 2. Preparar los datos
+X = df[['Age','Gender','Ethnicity','EducationLevel','BMI','Smoking','AlcoholConsumption','PhysicalActivity','DietQuality','SleepQuality','FamilyHistoryParkinsons',
+        'TraumaticBrainInjury','Hypertension','Diabetes','Depression','Stroke','SystolicBP','DiastolicBP','CholesterolTotal','CholesterolLDL','CholesterolHDL',
+        'CholesterolTriglycerides','UPDRS','MoCA','FunctionalAssessment','Tremor','Rigidity','Bradykinesia','PosturalInstability','SpeechProblems','SleepDisorders',
+        'Constipation']].values
+y = df['Diagnosis'].values
+
+# 3. Dividir los datos en entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. Inicializar y entrenar el modelo GaussianNB
+model = GaussianNB()
+model.fit(X_train, y_train)
+
+# 5. Evaluar el modelo
+y_pred = model.predict(X_test)
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
+
+# 6. Opcional: Visualizar la matriz de confusión
+plt.figure(figsize=(8, 6))
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, cmap='Blues', fmt='d', xticklabels=['No Parkinson', 'Parkinson'], yticklabels=['No Parkinson', 'Parkinson'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()
+
+# Modelo QDA Quadratic Discriminant Analysis
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.metrics import classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# 1. Cargar el dataset
+file_path = 'd:\\Ciencia de datos\\datos masivos\\Parkinson2\\parkinsons_disease_data.csv'
+df = pd.read_csv(file_path)
+
+# 2. Preparar los datos
+X = df[['Age','Gender','Ethnicity','EducationLevel','BMI','Smoking','AlcoholConsumption','PhysicalActivity','DietQuality','SleepQuality','FamilyHistoryParkinsons',
+        'TraumaticBrainInjury','Hypertension','Diabetes','Depression','Stroke','SystolicBP','DiastolicBP','CholesterolTotal','CholesterolLDL','CholesterolHDL',
+        'CholesterolTriglycerides','UPDRS','MoCA','FunctionalAssessment','Tremor','Rigidity','Bradykinesia','PosturalInstability','SpeechProblems','SleepDisorders',
+        'Constipation']].values
+y = df['Diagnosis'].values
+
+# 3. Dividir los datos en entrenamiento y prueba
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. Inicializar y entrenar el modelo QDA
+model = QuadraticDiscriminantAnalysis()
+model.fit(X_train, y_train)
+
+# 5. Evaluar el modelo
+y_pred = model.predict(X_test)
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
+
+# 6. Opcional: Visualizar la matriz de confusión
+plt.figure(figsize=(8, 6))
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, cmap='Blues', fmt='d', xticklabels=['No Parkinson', 'Parkinson'], yticklabels=['No Parkinson', 'Parkinson'])
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()
