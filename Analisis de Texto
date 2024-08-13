@@ -1,0 +1,122 @@
+# Carga y  preprocesamiento de datos
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+from sklearn.tree import plot_tree
+import matplotlib.pyplot as plt
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+from gensim.models.doc2vec import TaggedDocument
+import string
+
+nltk.download('punkt')
+nltk.download('stopwords')
+
+# Cargar el conjunto de datos
+data = pd.read_csv('d://ciencia de datos/datos masivos/clasificacion noticias/newsCorpora-trimmed.csv') 
+data.columns = ['category', 'text']
+
+print("Tamaño del DataFrame:", data.shape)
+print(data.head())
+
+# Filtrar solo las categorías de interés
+categories = ['b', 't', 'e', 'm']  # Business, Science and Technology, Entertainment, Health
+data = data[data['category'].isin(categories)]
+
+# Imprimir las categorías únicas después del filtrado
+print("Categorías únicas después del filtrado:")
+print(data['category'].unique())
+
+# Preprocesamiento de texto
+stop_words = set(stopwords.words('english'))
+def preprocess_text(text):
+    tokens = word_tokenize(text.lower())
+    tokens = [word for word in tokens if word.isalpha() and word not in stop_words]
+    return tokens
+
+data['tokens'] = data['text'].apply(preprocess_text)
+
+# Imprimir las primeras filas del DataFrame para verificar la columna 'tokens'
+print("Primeras filas del DataFrame con la columna 'tokens':")
+print(data[['text', 'tokens']].head())
+
+# Crear documentos etiquetados
+tagged_data = [TaggedDocument(words=row['tokens'], tags=[row['category']]) for index, row in data.iterrows()]
+
+print("Tipo de tagged_data:", type(tagged_data))
+print("Primeros 5 documentos etiquetados:")
+for doc in tagged_data[:5]:
+    print(doc)
+
+# Entrenar y guardar el modelo
+from gensim.models import Doc2Vec
+
+# print(tagged_data)
+
+# Entrenar el modelo Doc2Vec
+model = Doc2Vec(tagged_data, vector_size=100, window=5, min_count=5, workers=4, epochs=20)
+
+# Guardar el modelo
+model.save("doc2vec_model")
+
+print("Dimensiones del vector:", model.vector_size)
+print("Tamaño de la ventana:", model.window)
+print("Número mínimo de palabras:", model.min_count)
+print("Número de trabajadores:", model.workers)
+print("Número de épocas:", model.epochs)
+
+# Conversion de etiquetas a vectores y entrenar clasificacion
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
+
+# Convertir los documentos etiquetados a vectores
+def vectorize_doc(doc):
+    return model.infer_vector(doc.words)
+
+data['vector'] = data['tokens'].apply(lambda x: vectorize_doc(TaggedDocument(x, [0])))
+
+# Imprimir algunas filas de la columna 'vector' después de la vectorización
+print("Vectors after vectorization:")
+print(data['vector'].head())
+
+# Crear el conjunto de entrenamiento y prueba
+X = list(data['vector'])
+y = data['category']
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Imprimir algunas muestras de X_train, X_test, y_train, y_test
+print("Sample of X_train:")
+print(X_train[:2])  
+
+# Imprime las primeras 2 muestras del conjunto de entrenamiento
+print("Sample of X_test:")
+print(X_test[:2])  # Imprime las primeras 2 muestras del conjunto de prueba
+
+# Como se botaba mucho por el tiempo de procesamiento SVM se cambia por árbol de decisión
+
+# Entrenar el clasificador SVM
+# classifier = SVC(kernel='linear')
+# classifier.fit(X_train, y_train)
+
+# Evaluar el clasificador
+# y_pred = classifier.predict(X_test)
+# print(f"Accuracy: {accuracy_score(y_test, y_pred)}")
+
+
+# Modelo Árbol de Decisión
+model = DecisionTreeClassifier()
+model.fit(X_train, y_train)
+
+# Predicciones
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+print(f'Accuracy: {accuracy}')
+
+# Visualización del árbol
+plt.figure(figsize=(15,8))
+plot_tree(model, feature_names=vectorizer.get_feature_names_out(), class_names=model.classes_, filled=True)
+plt.show()
