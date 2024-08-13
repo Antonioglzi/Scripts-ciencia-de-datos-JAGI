@@ -1,0 +1,23 @@
+# Modelo BoW - 
+from sklearn.feature_extraction.text import CountVectorizer
+
+# Ejemplo de documentos
+documents = [
+    "El perro ladra",
+    "El gato maúlla",
+    "El perro y el gato son amigos",
+    "El perro ladra y el gato maúlla"
+]
+
+# Crear el modelo BoW
+vectorizer = CountVectorizer()
+
+# Ajustar y transformar los documentos en vectores
+X = vectorizer.fit_transform(documents)
+
+# Mostrar el vocabulario
+print("Vocabulario:", vectorizer.vocabulary_)
+
+# Mostrar la representación BoW de los documentos
+print("Representación BoW:\n", X.toarray())
+
