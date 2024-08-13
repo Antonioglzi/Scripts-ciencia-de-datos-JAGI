@@ -1,0 +1,21 @@
+#Modelo Word2Vec
+
+# Ejemplo de corpus de documentos
+sentences = [
+    ['el', 'perro', 'ladra'],
+    ['el', 'gato', 'maúlla'],
+    ['el', 'perro', 'y', 'el', 'gato', 'son', 'amigos'],
+    ['el', 'perro', 'ladra', 'y', 'el', 'gato', 'maúlla']
+]
+
+# Entrenar el modelo Word2Vec
+model = Word2Vec(sentences, vector_size=100, window=5, min_count=1, workers=4)
+
+# Obtener el vector de la palabra 'perro'
+vector = model.wv['perro']
+print( "Vector de 'perro':\n", vector, "de Tamaño ", vector.shape[0])
+
+      
+# Encontrar palabras similares a 'perro'
+similar_words = model.wv.most_similar('perro')
+print("Palabras similares a 'perro':\n", similar_words)
